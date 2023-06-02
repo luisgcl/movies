@@ -1,4 +1,3 @@
-"use client";
 // Importamos los módulos necesarios
 import "./globals.css";
 import { Inter } from "next/font/google";
