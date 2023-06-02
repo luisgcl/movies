@@ -38,7 +38,7 @@ export default function Home() {
 
   // Seleccionamos una película aleatoria de las populares al cargar los datos
   useEffect(() => {
-    if (dataMovies.length > 1) {
+    if (dataMovies.length > 0) {
       const randomIndex = Math.floor(Math.random() * dataMovies.length);
       setRandomMovie(dataMovies[randomIndex]);
     }
