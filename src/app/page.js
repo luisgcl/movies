@@ -1,113 +1,170 @@
-import Image from 'next/image'
+// Importamos los módulos necesarios
+"use client";
+import React, { useState } from "react";
+import Movie from "@/components/Movie";
+import { getMovies, getMoviesProx, setLoading } from "@/redux/slice/movies";
+import SwiperCore, { Navigation } from "swiper";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/swiper-bundle.css";
+
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
+import { imageUrl } from "@/helpers/config";
+import Loading from "@/components/Loading";
+
+// Inicializamos Swiper con el módulo de navegación
+SwiperCore.use([Navigation]);
 
 export default function Home() {
+  // Obtenemos los datos de películas populares y próximas desde el estado global
+  const { dataMovies, dataMoviesProx, loading } = useSelector(
+    (state) => state.movies
+  );
+
+  // Inicializamos el estado local para una película aleatoria
+  const [randomMovie, setRandomMovie] = useState(null);
+
+  // Obtenemos la función dispatch para enviar acciones al store
+  const dispatch = useDispatch();
+
+  // Cargamos los datos de películas populares y próximas al montar el componente
+  useEffect(() => {
+    dispatch(getMovies());
+    dispatch(getMoviesProx());
+    dispatch(setLoading(true));
+    console.log(loading);
+  }, [dispatch]);
+
+  // Seleccionamos una película aleatoria de las populares al cargar los datos
+  useEffect(() => {
+    if (dataMovies.length > 1) {
+      const randomIndex = Math.floor(Math.random() * dataMovies.length);
+      setRandomMovie(dataMovies[randomIndex]);
+    }
+  }, [dataMovies]);
+
+  // Renderizamos el componente
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.js</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <>
+      {!loading ? (
+        <Loading />
+      ) : (
+        <div className="bg-mi-color w-full">
+          {/* Mostramos la película aleatoria como fondo */}
+          {randomMovie && (
+            <div
+              className="bg-cover flex items-center h-screen"
+              style={{
+                backgroundImage: `url(${imageUrl}${randomMovie.backdrop_path})`,
+                backgroundSize: "100% 100%",
+              }}
+            >
+              <div className="h-full">
+                <div className="px-10 py-80 h-full bg-gradient-to-t  from-mi-color to-transparent ml-0">
+                  {/* Mostramos los detalles de la película aleatoria */}
+                  <Movie
+                    id={randomMovie.id}
+                    title={randomMovie.title}
+                    randomMovie={randomMovie}
+                    overview={randomMovie.overview}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+          {/* Mostramos las películas populares */}
+          <p className="text-3xl font-bold text-white text-center my-2">
+            Populares
+          </p>
+          <div className="mx-10">
+            <Swiper
+              spaceBetween={10}
+              slidesPerView={8}
+              slidesPerGroup={8}
+              speed={1000}
+              navigation
+              breakpoints={{
+                340: {
+                  slidesPerView: 1,
+                  slidesPerGroup: 1,
+                },
+                640: {
+                  slidesPerView: 2,
+                  slidesPerGroup: 2,
+                },
+                768: {
+                  slidesPerView: 3,
+                  slidesPerGroup: 3,
+                },
+                1024: {
+                  spaceBetween: 10,
+                  slidesPerColumn: 1,
+                  slidesPerView: 8,
+                  slidesPerGroup: 8,
+                },
+              }}
+            >
+              {/* Mostramos cada película popular en un slide */}
+              {dataMovies.map((movie) => (
+                <SwiperSlide key={movie.id}>
+                  <Movie
+                    id={movie.id}
+                    title={movie.title}
+                    poster_path={movie.poster_path}
+                    release_date={movie.release_date.slice(0, 4)}
+                  />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </div>
+          {/* Mostramos las películas próximas */}
+          <p className="text-3xl font-bold text-white text-center my-2">
+            Próximas
+          </p>
+          <div className="mx-10">
+            <Swiper
+              spaceBetween={10}
+              slidesPerView={8}
+              slidesPerGroup={8}
+              speed={1000}
+              navigation
+              breakpoints={{
+                340: {
+                  slidesPerView: 1,
+                  slidesPerGroup: 1,
+                },
+                640: {
+                  slidesPerView: 2,
+                  slidesPerGroup: 2,
+                },
+                768: {
+                  slidesPerView: 3,
+                  slidesPerGroup: 3,
+                },
+                1024: {
+                  spaceBetween: 10,
+                  slidesPerColumn: 1,
+                  slidesPerView: 8,
+                  slidesPerGroup: 8,
+                },
+              }}
+            >
+              {/* Mostramos cada película próxima en un slide */}
+              {dataMoviesProx.map((movie) => (
+                <SwiperSlide key={movie.id}>
+                  <Movie
+                    id={movie.id}
+                    title={movie.title}
+                    poster_path={movie.poster_path}
+                    release_date={movie.release_date.slice(0, 4)}
+                  />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </div>
         </div>
-      </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://beta.nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800 hover:dark:bg-opacity-30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+      )}
+    </>
+  );
 }
