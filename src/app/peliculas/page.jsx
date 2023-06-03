@@ -116,7 +116,7 @@ const page = () => {
               // Mostramos cada película en un div con estilo
               <div
                 key={m.id}
-                className="flex flex-col items-center cursor-pointer hover:scale-105 transition-duration duration-500 w-80"
+                className="flex flex-col items-center cursor-pointer hover:scale-105 transition-duration duration-500 w-64"
                 onClick={() => router.push(`/pelicula/${m.id}`)}
               >
                 <img
