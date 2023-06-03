@@ -140,7 +140,7 @@ const page = () => {
               </div>
             ))}
           </div>
-          // Renderizamos el componente Pagination
+          {/* Renderizamos el componente Pagination */}
           <Pagintation />
         </div>
       )}
