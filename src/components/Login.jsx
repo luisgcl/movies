@@ -25,7 +25,7 @@ const Login = () => {
           email,
           password
         );
-        e.target.reset();
+        e.target.reset(); // <-- Resetea solo si fue exitoso
         console.log("Usuario registrado:", userCredential.user);
       } catch (error) {
         alert(
@@ -40,7 +40,7 @@ const Login = () => {
           email,
           password
         );
-        e.target.reset();
+        e.target.reset(); // <-- Resetea solo si fue exitoso
         console.log("Usuario logueado:", userCredential.user);
       } catch (error) {
         alert("El correo o la contrasena son incorrectos");
